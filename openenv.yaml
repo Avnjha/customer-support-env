@@ -1,0 +1,73 @@
+name: customer-support-env
+version: "1.0.0"
+description: >
+  An OpenEnv environment where an AI agent handles customer support tickets.
+  The agent classifies issues, looks up order and customer records from a
+  synthetic database, responds correctly, then resolves or escalates — all
+  graded deterministically against a policy knowledge base.
+
+author: openenv-hackathon
+tags: [openenv, customer-support, nlp, real-world, deterministic-grader]
+
+tasks:
+  - id: easy
+    description: Classify the ticket into the correct category.
+    difficulty: easy
+    max_steps: 10
+    score_range: [0.0, 1.0]
+
+  - id: medium
+    description: Classify, lookup data, respond correctly, make correct escalation decision.
+    difficulty: medium
+    max_steps: 10
+    score_range: [0.0, 1.0]
+
+  - id: hard
+    description: Full pipeline with hidden ticket type. Classify, lookup, respond, escalate or close with correct resolution. Efficiency bonus for <= 4 steps.
+    difficulty: hard
+    max_steps: 10
+    score_range: [0.0, 1.0]
+
+observation_space:
+  type: object
+  fields:
+    - ticket_id: string
+    - ticket_text: string
+    - ticket_type: string
+    - history: array
+    - status: enum [open, in_progress, escalated, closed]
+    - order_record: object (nullable)
+    - customer_record: object (nullable)
+    - step_count: integer
+    - max_steps: integer
+    - task_id: string
+
+action_space:
+  type: object
+  action_types:
+    - classify
+    - lookup_order
+    - lookup_customer
+    - respond
+    - close
+    - escalate
+
+reward:
+  type: float
+  range: [-1.0, 1.0]
+  shaped: true
+  description: Partial reward at every step. Positive for correct actions, negative for wrong classifications, wrong escalations, and repeated actions.
+
+endpoints:
+  health:   GET  /health
+  reset:    POST /reset
+  step:     POST /step
+  state:    GET  /state
+  tasks:    GET  /tasks
+  grader:   POST /grader
+  baseline: POST /baseline
+
+docker:
+  port: 7860
+  build: docker build -t customer-support-env .
+  run:   docker run -p 7860:7860 customer-support-env
