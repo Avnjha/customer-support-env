@@ -1,3 +1,10 @@
+title: Customer Support OpenEnv
+emoji: 🤖
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_file: app/main.py
+pinned: false
 # Customer Support OpenEnv
 
 An OpenEnv-compliant environment where an AI agent handles customer support tickets by classifying issues, looking up order/customer data, responding correctly, and resolving or escalating — all graded deterministically against a policy knowledge base.
